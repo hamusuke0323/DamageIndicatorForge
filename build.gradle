@@ -133,6 +133,8 @@ jar {
         attributes "TweakOrder": "0"
         attributes "MixinConfigs": mod_mixin_configs.replace('${mod_id}', mod_id)
     }
+
+    rename "mixin.refmap.json", "mixins.${mod_id}.refmap.json"
 }
 
 // Example configuration to allow publishing using the maven-publish task
