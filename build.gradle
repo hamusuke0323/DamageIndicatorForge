@@ -119,8 +119,10 @@ processResources {
 jar {
     from {
         configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
-    } {
-        exclude "LICENSE", "LICENSE-Mixin"
+    }
+
+    from("LICENSE-Mixin") {
+        include 'LICENSE-Mixin'
     }
 
     manifest {
