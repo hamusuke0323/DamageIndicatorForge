@@ -9,7 +9,6 @@ import net.minecraftforge.common.config.Property;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Locale;
 
 @Config(modid = DamageIndicator.MOD_ID, category = "color")
 public class DamageIndicatorConfigColor {
@@ -58,7 +57,9 @@ public class DamageIndicatorConfigColor {
     public static int getColorFromDamageSourceType(String type) {
         if (type != null) {
             for (RGB rgb : configs) {
-                if (rgb.name.contains(type.toLowerCase(Locale.ROOT))) {
+                if (rgb.name.equalsIgnoreCase(type + "damage")) {
+                    return rgb.toRGBColor();
+                } else if (rgb.name.equalsIgnoreCase(type)) {
                     return rgb.toRGBColor();
                 }
             }

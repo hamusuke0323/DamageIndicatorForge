@@ -102,8 +102,13 @@ public class IndicatorRenderer {
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x - camX, y - camY, z - camZ);
-        GlStateManager.rotate(-client.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(client.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        if (client.gameSettings.thirdPersonView == 2) {
+            GlStateManager.rotate(-client.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-client.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        } else {
+            GlStateManager.rotate(-client.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(client.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        }
         GlStateManager.scale(-scale, -scale, scale);
         GL11.glNormal3d(0.0D, 0.0D, -1.0D * scale);
         GlStateManager.disableDepth();
