@@ -37,9 +37,9 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     }
 
     @Override
-    public void send(String text, int color, float scaleMul) {
+    public void send(String text, String source, float scaleMul) {
         if (!this.world.isRemote) {
-            DamageIndicatorPacket damageIndicatorPacket = new DamageIndicatorPacket(this.getRandomX(0.5D), this.getRandomY(MathHelper.nextDouble(this.rand, 0.5D, 1.2D)), this.getRandomZ(0.5D), text, color, scaleMul);
+            DamageIndicatorPacket damageIndicatorPacket = new DamageIndicatorPacket(this.getRandomX(0.5D), this.getRandomY(MathHelper.nextDouble(this.rand, 0.5D, 1.2D)), this.getRandomZ(0.5D), text, source, scaleMul);
             this.world.getMinecraftServer().getPlayerList().getPlayers().forEach(entityPlayer -> {
                 if (entityPlayer.getDistance(this) < 64) {
                     NetworkManager.sendToClient(damageIndicatorPacket, entityPlayer);

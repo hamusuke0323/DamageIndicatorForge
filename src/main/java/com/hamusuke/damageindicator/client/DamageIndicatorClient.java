@@ -47,9 +47,13 @@ public class DamageIndicatorClient {
         }
     }
 
-    public void addRenderer(double x, double y, double z, String text, int color, float scaleMul) {
+    public void addRenderer(double x, double y, double z, String text, String source, float scaleMul) {
         float distance = (float) Math.sqrt(mc.getRenderManager().getDistanceToCamera(x, y, z));
-        this.queue.add(new IndicatorRenderer(x, y, z, text, color, distance, scaleMul));
+        this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, scaleMul));
+    }
+
+    public void syncIndicatorColor() {
+        this.queue.forEach(IndicatorRenderer::syncColorFromConfig);
     }
 
     public static DamageIndicatorClient getInstance() {

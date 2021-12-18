@@ -9,11 +9,11 @@ public interface LivingEntityInvoker {
         return false;
     }
 
-    default void send(String text, int color, float scaleMul) {
+    default void send(String text, String source, float scaleMul) {
     }
 
     default void sendImmune() {
-        this.send(I18n.format("damageindicator.indicator.immune"), 11184810, NORMAL);
+        this.send(I18n.format("damageindicator.indicator.immune"), "immune", NORMAL);
     }
 
     default void setCritical(boolean critical) {

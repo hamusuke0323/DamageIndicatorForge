@@ -113,6 +113,15 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    copy {
+        delete {
+            delete "$buildDir/classes/java/main"
+            exclude "$buildDir/classes/java/main/com"
+        }
+        into "$buildDir/classes/java/main"
+        from "$buildDir/resources/main"
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -142,14 +151,6 @@ jar {
 jar.finalizedBy('reobfJar') 
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
-
-copy {
-    delete {
-        delete "$buildDir/classes/java/main"
-    }
-    into "$buildDir/classes/java/main"
-    from sourceSets.main.resources
-}
 
 publishing {
     publications {

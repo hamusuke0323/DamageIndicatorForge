@@ -1,5 +1,6 @@
 package com.hamusuke.damageindicator;
 
+import com.hamusuke.damageindicator.config.DamageIndicatorConfigColor;
 import com.hamusuke.damageindicator.invoker.LivingEntityInvoker;
 import com.hamusuke.damageindicator.network.NetworkManager;
 import com.hamusuke.damageindicator.proxy.CommonProxy;
@@ -9,10 +10,12 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -20,31 +23,28 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION)
+@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION, guiFactory = "com.hamusuke." + DamageIndicator.MOD_ID + ".client.gui.screen.ConfigScreenFactory")
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
     public static final String MOD_NAME = "Damage Indicator";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.1.0";
     public static final float NORMAL = 1.0F;
     public static final float CRITICAL = 2.0F;
     @SidedProxy(clientSide = "com.hamusuke.damageindicator.proxy.ClientProxy", serverSide = "com.hamusuke.damageindicator.proxy.CommonProxy")
     public static CommonProxy PROXY;
+    private static Configuration config;
 
-    @Mod.EventHandler
-    private void onSetup(final FMLPreInitializationEvent event) {
-        NetworkManager.init();
-        PROXY.preInit();
+    public static Configuration getConfig() {
+        return config;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onHeal(final LivingHealEvent event) {
-        EntityLivingBase livingEntity = event.getEntityLiving();
-        if (!event.isCanceled() && livingEntity instanceof LivingEntityInvoker) {
-            float amount = Math.min(livingEntity.getMaxHealth() - livingEntity.getHealth(), event.getAmount());
-            if (!livingEntity.world.isRemote && amount > 0.0F) {
-                ((LivingEntityInvoker) livingEntity).send("+" + MathHelper.ceil(amount), 5635925, NORMAL);
-            }
+    private static void syncConfig(boolean load) {
+        if (load) {
+            config.load();
         }
+
+        DamageIndicatorConfigColor.sync(config);
+        PROXY.onConfigChanged();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -67,6 +67,26 @@ public class DamageIndicator {
         }
     }
 
+    @Mod.EventHandler
+    private void onSetup(final FMLPreInitializationEvent event) {
+        NetworkManager.init();
+        PROXY.preInit(event);
+        config = new Configuration(event.getSuggestedConfigurationFile());
+        config.load();
+        syncConfig(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onHeal(final LivingHealEvent event) {
+        EntityLivingBase livingEntity = event.getEntityLiving();
+        if (!event.isCanceled() && livingEntity instanceof LivingEntityInvoker) {
+            float amount = Math.min(livingEntity.getMaxHealth() - livingEntity.getHealth(), event.getAmount());
+            if (!livingEntity.world.isRemote && amount > 0.0F) {
+                ((LivingEntityInvoker) livingEntity).send("+" + MathHelper.ceil(amount), "heal", NORMAL);
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDamageLast(final LivingDamageEvent event) {
         EntityLivingBase livingEntity = event.getEntityLiving();
@@ -83,19 +103,14 @@ public class DamageIndicator {
                     livingEntityInvoker.setCritical(false);
                 }
             }
-            invoker.send("" + MathHelper.ceil(event.getAmount()), getColorFromDamageSource(source), scaleMul);
+            invoker.send("" + MathHelper.ceil(event.getAmount()), source.getDamageType(), scaleMul);
         }
     }
 
-    private static int getColorFromDamageSource(DamageSource source) {
-        if (source.isFireDamage()) {
-            return 16750080;
-        } else if (source == DamageSource.FALL || source == DamageSource.FALLING_BLOCK || source == DamageSource.IN_WALL) {
-            return 16769280;
-        } else if (source.canHarmInCreative()) {
-            return 0;
+    @SubscribeEvent
+    public void onConfigChanged(final ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (MOD_ID.equals(event.getModID())) {
+            syncConfig(false);
         }
-
-        return 16777215;
     }
 }

@@ -1,5 +1,6 @@
 package com.hamusuke.damageindicator.client.renderer;
 
+import com.hamusuke.damageindicator.config.DamageIndicatorConfigColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -31,7 +32,8 @@ public class IndicatorRenderer {
     protected float gravityStrength;
     protected float g;
     protected final String text;
-    protected final int color;
+    protected final String damageSourceType;
+    protected int color;
     protected int textWidth = -1;
     protected long startedTickingTimeMs;
     protected final float distance;
@@ -40,7 +42,7 @@ public class IndicatorRenderer {
     protected boolean paused;
     protected long passedTimeMs;
 
-    public IndicatorRenderer(double x, double y, double z, String text, int color, float distance, float scaleMultiplier) {
+    public IndicatorRenderer(double x, double y, double z, String text, String damageSourceType, float distance, float scaleMultiplier) {
         this.boundingBox = EMPTY_BOUNDING_BOX;
         this.spacingXZ = 0.6F;
         this.spacingY = 1.8F;
@@ -53,7 +55,8 @@ public class IndicatorRenderer {
         this.maxAge = 20;
         this.gravityStrength = -0.2F;
         this.text = text;
-        this.color = color;
+        this.damageSourceType = damageSourceType;
+        this.syncColorFromConfig();
         this.distance = distance;
         this.scaleMultiplier = MathHelper.clamp(scaleMultiplier, 1.0F, 2.0F);
         this.startedTickingTimeMs = System.currentTimeMillis();
@@ -145,6 +148,10 @@ public class IndicatorRenderer {
 
     private static double lerp(double delta, double start, double end) {
         return start + delta * (end - start);
+    }
+
+    public void syncColorFromConfig() {
+        this.color = DamageIndicatorConfigColor.getColorFromDamageSourceType(this.damageSourceType);
     }
 
     public void markDead() {
