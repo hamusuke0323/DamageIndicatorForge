@@ -1,8 +1,10 @@
 package com.hamusuke.damageindicator.proxy;
 
 import com.hamusuke.damageindicator.client.DamageIndicatorClient;
+import com.hamusuke.damageindicator.config.ClientConfig;
 import com.hamusuke.damageindicator.network.DamageIndicatorPacket;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -18,8 +20,9 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void onConfigChanged() {
-        super.onConfigChanged();
+    public void onConfigChanged(Configuration config) {
+        super.onConfigChanged(config);
+        ClientConfig.sync(config);
         DamageIndicatorClient.getInstance().syncIndicatorColor();
     }
 

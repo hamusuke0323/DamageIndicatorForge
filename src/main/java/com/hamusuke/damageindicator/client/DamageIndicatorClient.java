@@ -3,6 +3,7 @@ package com.hamusuke.damageindicator.client;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.hamusuke.damageindicator.client.renderer.IndicatorRenderer;
+import com.hamusuke.damageindicator.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -49,7 +50,9 @@ public class DamageIndicatorClient {
 
     public void addRenderer(double x, double y, double z, String text, String source, float scaleMul) {
         float distance = (float) Math.sqrt(mc.getRenderManager().getDistanceToCamera(x, y, z));
-        this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, scaleMul));
+        if (distance <= ClientConfig.renderDistance) {
+            this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, scaleMul));
+        }
     }
 
     public void syncIndicatorColor() {

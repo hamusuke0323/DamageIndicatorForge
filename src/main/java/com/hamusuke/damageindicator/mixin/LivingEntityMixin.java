@@ -12,15 +12,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityLivingBase.class)
 public abstract class LivingEntityMixin extends Entity implements LivingEntityInvoker {
-    @Shadow
-    protected float lastDamage;
     private boolean isCritical;
 
     LivingEntityMixin(World worldIn) {
@@ -30,7 +27,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     @Inject(method = "attackEntityFrom", at = @At("RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (!((Object) this instanceof EntityPlayer) && !((Object) this instanceof EntityShulker) && !((Object) this instanceof EntityWither)) {
-            if (!this.world.isRemote && !cir.getReturnValue() && !this.isDead && amount > this.lastDamage) {
+            if (!this.world.isRemote && !cir.getReturnValue() && !this.isDead) {
                 this.sendImmune();
             }
         }
@@ -40,11 +37,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     public void send(String text, String source, float scaleMul) {
         if (!this.world.isRemote) {
             DamageIndicatorPacket damageIndicatorPacket = new DamageIndicatorPacket(this.getRandomX(0.5D), this.getRandomY(MathHelper.nextDouble(this.rand, 0.5D, 1.2D)), this.getRandomZ(0.5D), text, source, scaleMul);
-            this.world.getMinecraftServer().getPlayerList().getPlayers().forEach(entityPlayer -> {
-                if (entityPlayer.getDistance(this) < 64) {
-                    NetworkManager.sendToClient(damageIndicatorPacket, entityPlayer);
-                }
-            });
+            this.world.getMinecraftServer().getPlayerList().getPlayers().forEach(entityPlayer -> NetworkManager.sendToClient(damageIndicatorPacket, entityPlayer));
         }
     }
 

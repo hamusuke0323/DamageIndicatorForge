@@ -1,6 +1,5 @@
 package com.hamusuke.damageindicator;
 
-import com.hamusuke.damageindicator.config.DamageIndicatorConfigColor;
 import com.hamusuke.damageindicator.invoker.LivingEntityInvoker;
 import com.hamusuke.damageindicator.network.NetworkManager;
 import com.hamusuke.damageindicator.proxy.CommonProxy;
@@ -22,12 +21,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION, guiFactory = "com.hamusuke." + DamageIndicator.MOD_ID + ".client.gui.screen.ConfigScreenFactory")
+@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION, guiFactory = "com.hamusuke." + DamageIndicator.MOD_ID + ".client.gui.screen.ConfigScreenFactory", updateJSON = "https://raw.githubusercontent.com/hamusuke0323/DamageIndicatorForge/update/update.json")
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
     public static final String MOD_NAME = "Damage Indicator";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.1.1";
+    public static final Logger LOGGER = LogManager.getLogger();
     public static final float NORMAL = 1.0F;
     public static final float CRITICAL = 2.0F;
     @SidedProxy(clientSide = "com.hamusuke.damageindicator.proxy.ClientProxy", serverSide = "com.hamusuke.damageindicator.proxy.CommonProxy")
@@ -43,8 +45,7 @@ public class DamageIndicator {
             config.load();
         }
 
-        DamageIndicatorConfigColor.sync(config);
-        PROXY.onConfigChanged();
+        PROXY.onConfigChanged(config);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

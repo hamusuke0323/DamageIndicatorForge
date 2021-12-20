@@ -3,6 +3,7 @@ package com.hamusuke.damageindicator.proxy;
 import com.hamusuke.damageindicator.DamageIndicator;
 import com.hamusuke.damageindicator.network.DamageIndicatorPacket;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -12,7 +13,7 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(new DamageIndicator());
     }
 
-    public void onConfigChanged() {
+    public void onConfigChanged(Configuration config) {
     }
 
     public IMessage onMessage(DamageIndicatorPacket packet, MessageContext context) {

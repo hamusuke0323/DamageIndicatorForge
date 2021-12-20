@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion("1.12.2")
-@IFMLLoadingPlugin.Name("Damage Indicator")
+@IFMLLoadingPlugin.Name("Damage Indicator Core")
 public class CoreMod implements IFMLLoadingPlugin {
     private static final Logger LOGGER = LogManager.getLogger("Damage Indicator Mod Core");
 

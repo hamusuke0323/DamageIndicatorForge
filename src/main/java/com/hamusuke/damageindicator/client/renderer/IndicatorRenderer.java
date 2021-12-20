@@ -1,6 +1,6 @@
 package com.hamusuke.damageindicator.client.renderer;
 
-import com.hamusuke.damageindicator.config.DamageIndicatorConfigColor;
+import com.hamusuke.damageindicator.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -156,7 +156,7 @@ public class IndicatorRenderer {
     }
 
     public void syncColorFromConfig() {
-        this.color = DamageIndicatorConfigColor.getColorFromDamageSourceType(this.damageSourceType);
+        this.color = ClientConfig.ColorConfig.getColorFromDamageSourceType(this.damageSourceType);
     }
 
     public void markDead() {

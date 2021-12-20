@@ -21,9 +21,9 @@ public class ConfigScreen extends GuiConfig {
     }
 
     private static List<IConfigElement> getConfigElements() {
-        List<IConfigElement> parent = Lists.newArrayList();
-        parent.add(new DummyConfigElement.DummyCategoryElement("color", "", Color.class));
-        return parent;
+        List<IConfigElement> client = Lists.newArrayList();
+        client.add(new DummyConfigElement.DummyCategoryElement("client", DamageIndicator.MOD_ID + ".category.clientsettings", Client.class));
+        return client;
     }
 
     @Override
@@ -32,14 +32,14 @@ public class ConfigScreen extends GuiConfig {
         DamageIndicator.getConfig().save();
     }
 
-    public static class Color extends GuiConfigEntries.CategoryEntry {
-        public Color(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
+    public static class Client extends GuiConfigEntries.CategoryEntry {
+        public Client(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
             super(owningScreen, owningEntryList, configElement);
         }
 
         @Override
         protected GuiScreen buildChildScreen() {
-            return new GuiConfig(this.owningScreen, new ConfigElement(DamageIndicator.getConfig().getCategory("color")).getChildElements(), this.owningScreen.modID, "color", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart, this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart, GuiConfig.getAbridgedConfigPath(DamageIndicator.getConfig().toString()));
+            return new GuiConfig(this.owningScreen, new ConfigElement(DamageIndicator.getConfig().getCategory("client")).getChildElements(), this.owningScreen.modID, "client", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart, this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart, GuiConfig.getAbridgedConfigPath(DamageIndicator.getConfig().toString()));
         }
     }
 }
