@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.hamusuke.damageindicator.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerEntityMixin",
+    "ShulkerEntityMixin",
+    "WitherEntityMixin"
+  ],
+  "refmap": "mixins.damageindicator.refmap.json"
+}
