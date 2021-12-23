@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class NetworkManager {
-    private static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(DamageIndicator.MOD_ID + ".damage_packet");
+    private static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(DamageIndicator.MOD_ID);
 
     public static void init() {
         INSTANCE.registerMessage(DamageIndicatorPacketHandler.class, DamageIndicatorPacket.class, 0, Side.CLIENT);

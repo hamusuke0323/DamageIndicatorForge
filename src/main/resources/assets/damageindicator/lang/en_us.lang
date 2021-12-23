@@ -20,5 +20,6 @@ damageindicator.category.anvildamage=Anvil Damage
 damageindicator.category.fallingblockdamage=Falling Block Damage
 damageindicator.category.dragonbreathdamage=Dragon Breath Damage
 damageindicator.category.fireworksdamage=Fireworks Damage
+damageindicator.config.color.crit=Change color when critical hit
 damageindicator.category.heal=Heal
 damageindicator.category.immune=Immune

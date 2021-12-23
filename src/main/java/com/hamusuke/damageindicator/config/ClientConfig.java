@@ -14,6 +14,7 @@ import java.util.List;
 @Config(modid = DamageIndicator.MOD_ID, category = "client")
 public class ClientConfig {
     public static int renderDistance = 64;
+    public static boolean changeColorWhenCrit;
 
     public static void sync(Configuration config) {
         Property renderDistance = config.get("client", "renderDistance", 64);
@@ -21,6 +22,10 @@ public class ClientConfig {
         renderDistance.setMaxValue(256);
         renderDistance.setMinValue(0);
         ClientConfig.renderDistance = renderDistance.getInt(64);
+
+        Property changeColorWhenCrit = config.get("client", "changeColorWhenCrit", false);
+        changeColorWhenCrit.setLanguageKey(DamageIndicator.MOD_ID + ".config.color.crit");
+        ClientConfig.changeColorWhenCrit = changeColorWhenCrit.getBoolean(false);
 
         ColorConfig.configs.forEach(rgb -> rgb.sync(config));
 
@@ -53,6 +58,7 @@ public class ClientConfig {
         public static RGB fallingBlockDamage = register("fallingblockdamage", 255, 225, 0);
         public static RGB dragonBreathDamage = register("dragonbreathdamage");
         public static RGB fireworksDamage = register("fireworksdamage");
+        public static RGB critical = register("critical", 255, 255, 0);
         public static RGB heal = register("heal", 85, 255, 85);
         public static RGB immune = register("immune", 170, 170, 170);
 
@@ -72,9 +78,7 @@ public class ClientConfig {
         public static int getColorFromDamageSourceType(String type) {
             if (type != null) {
                 for (RGB rgb : configs) {
-                    if (rgb.name.equalsIgnoreCase(type + "damage")) {
-                        return rgb.toRGBColor();
-                    } else if (rgb.name.equalsIgnoreCase(type)) {
+                    if (rgb.name.replace("damage", "").equalsIgnoreCase(type)) {
                         return rgb.toRGBColor();
                     }
                 }
@@ -85,7 +89,7 @@ public class ClientConfig {
 
         public static class RGB {
             @Config.Ignore
-            private final String name;
+            protected final String name;
             public int red;
             public int green;
             public int blue;

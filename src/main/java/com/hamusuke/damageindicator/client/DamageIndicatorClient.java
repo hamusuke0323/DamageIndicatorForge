@@ -16,6 +16,8 @@ import java.util.Queue;
 
 @SideOnly(Side.CLIENT)
 public class DamageIndicatorClient {
+    public static final float NORMAL = 1.0F;
+    public static final float CRITICAL = 2.0F;
     private static final Minecraft mc = Minecraft.getMinecraft();
     private final Queue<IndicatorRenderer> queue = Queues.newLinkedBlockingDeque();
     private static DamageIndicatorClient instance;
@@ -48,10 +50,10 @@ public class DamageIndicatorClient {
         }
     }
 
-    public void addRenderer(double x, double y, double z, String text, String source, float scaleMul) {
+    public void addRenderer(double x, double y, double z, String text, String source, boolean crit) {
         float distance = (float) Math.sqrt(mc.getRenderManager().getDistanceToCamera(x, y, z));
         if (distance <= ClientConfig.renderDistance) {
-            this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, scaleMul));
+            this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, crit));
         }
     }
 

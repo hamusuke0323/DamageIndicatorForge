@@ -1,5 +1,6 @@
 package com.hamusuke.damageindicator.client.renderer;
 
+import com.hamusuke.damageindicator.client.DamageIndicatorClient;
 import com.hamusuke.damageindicator.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -33,6 +34,7 @@ public class IndicatorRenderer {
     protected float g;
     protected final String text;
     protected final String damageSourceType;
+    protected final boolean crit;
     protected int color;
     protected int textWidth = -1;
     protected long startedTickingTimeMs;
@@ -42,7 +44,7 @@ public class IndicatorRenderer {
     protected boolean paused;
     protected long passedTimeMs;
 
-    public IndicatorRenderer(double x, double y, double z, String text, String damageSourceType, float distance, float scaleMultiplier) {
+    public IndicatorRenderer(double x, double y, double z, String text, String damageSourceType, float distance, boolean crit) {
         this.boundingBox = EMPTY_BOUNDING_BOX;
         this.spacingXZ = 0.6F;
         this.spacingY = 1.8F;
@@ -56,9 +58,10 @@ public class IndicatorRenderer {
         this.gravityStrength = -0.2F;
         this.text = text;
         this.damageSourceType = damageSourceType;
+        this.crit = crit;
         this.syncColorFromConfig();
         this.distance = distance;
-        this.scaleMultiplier = MathHelper.clamp(scaleMultiplier, 1.0F, 2.0F);
+        this.scaleMultiplier = this.crit ? DamageIndicatorClient.CRITICAL : DamageIndicatorClient.NORMAL;
         this.startedTickingTimeMs = System.currentTimeMillis();
     }
 
@@ -156,7 +159,7 @@ public class IndicatorRenderer {
     }
 
     public void syncColorFromConfig() {
-        this.color = ClientConfig.ColorConfig.getColorFromDamageSourceType(this.damageSourceType);
+        this.color = ClientConfig.ColorConfig.getColorFromDamageSourceType(ClientConfig.changeColorWhenCrit && this.crit ? "critical" : this.damageSourceType);
     }
 
     public void markDead() {

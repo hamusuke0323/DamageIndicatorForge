@@ -10,18 +10,18 @@ public class DamageIndicatorPacket implements IMessage {
     private double z;
     private String text = "";
     private String source = "generic";
-    private float scaleMultiplier;
+    private boolean crit;
 
     public DamageIndicatorPacket() {
     }
 
-    public DamageIndicatorPacket(double x, double y, double z, String text, String source, float scaleMultiplier) {
+    public DamageIndicatorPacket(double x, double y, double z, String text, String source, boolean crit) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.text = text;
         this.source = source;
-        this.scaleMultiplier = scaleMultiplier;
+        this.crit = crit;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class DamageIndicatorPacket implements IMessage {
         this.z = buf.readDouble();
         this.text = ByteBufUtils.readUTF8String(buf);
         this.source = ByteBufUtils.readUTF8String(buf);
-        this.scaleMultiplier = buf.readFloat();
+        this.crit = buf.readBoolean();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class DamageIndicatorPacket implements IMessage {
         buf.writeDouble(this.z);
         ByteBufUtils.writeUTF8String(buf, this.text);
         ByteBufUtils.writeUTF8String(buf, this.source);
-        buf.writeFloat(this.scaleMultiplier);
+        buf.writeBoolean(this.crit);
     }
 
     public double getX() {
@@ -64,7 +64,7 @@ public class DamageIndicatorPacket implements IMessage {
         return this.source;
     }
 
-    public float getScaleMultiplier() {
-        return this.scaleMultiplier;
+    public boolean isCrit() {
+        return this.crit;
     }
 }

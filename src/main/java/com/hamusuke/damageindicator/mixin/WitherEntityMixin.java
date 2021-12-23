@@ -16,7 +16,7 @@ public abstract class WitherEntityMixin extends LivingEntityMixin {
 
     @Inject(method = "attackEntityFrom", at = @At("RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!this.world.isRemote && !this.isDead && !cir.getReturnValue()) {
+        if (!this.world.isRemote && !this.isDeadOrDying() && !cir.getReturnValue()) {
             this.sendImmune();
         }
     }

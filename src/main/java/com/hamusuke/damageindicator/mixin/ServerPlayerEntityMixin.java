@@ -16,7 +16,7 @@ public abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 
     @Inject(method = "attackEntityFrom", at = @At("RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue() && !this.isDead) {
+        if (!cir.getReturnValue() && !this.isDeadOrDying()) {
             this.sendImmune();
         }
     }

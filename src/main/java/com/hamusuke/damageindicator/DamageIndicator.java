@@ -28,10 +28,8 @@ import org.apache.logging.log4j.Logger;
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
     public static final String MOD_NAME = "Damage Indicator";
-    public static final String VERSION = "1.1.1";
+    public static final String VERSION = "1.1.2";
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final float NORMAL = 1.0F;
-    public static final float CRITICAL = 2.0F;
     @SidedProxy(clientSide = "com.hamusuke.damageindicator.proxy.ClientProxy", serverSide = "com.hamusuke.damageindicator.proxy.CommonProxy")
     public static CommonProxy PROXY;
     private static Configuration config;
@@ -83,7 +81,7 @@ public class DamageIndicator {
         if (!event.isCanceled() && livingEntity instanceof LivingEntityInvoker) {
             float amount = Math.min(livingEntity.getMaxHealth() - livingEntity.getHealth(), event.getAmount());
             if (!livingEntity.world.isRemote && amount > 0.0F) {
-                ((LivingEntityInvoker) livingEntity).send("+" + MathHelper.ceil(amount), "heal", NORMAL);
+                ((LivingEntityInvoker) livingEntity).send("+" + MathHelper.ceil(amount), "heal", false);
             }
         }
     }
@@ -94,17 +92,17 @@ public class DamageIndicator {
         if (!livingEntity.world.isRemote && livingEntity instanceof LivingEntityInvoker) {
             LivingEntityInvoker invoker = (LivingEntityInvoker) livingEntity;
             DamageSource source = event.getSource();
-            float scaleMul = NORMAL;
+            boolean bl = false;
 
             Entity entity = source.getTrueSource();
             if (entity instanceof LivingEntityInvoker) {
                 LivingEntityInvoker livingEntityInvoker = (LivingEntityInvoker) entity;
                 if (livingEntityInvoker.isCritical()) {
-                    scaleMul = CRITICAL;
+                    bl = true;
                     livingEntityInvoker.setCritical(false);
                 }
             }
-            invoker.send("" + MathHelper.ceil(event.getAmount()), source.getDamageType(), scaleMul);
+            invoker.send("" + MathHelper.ceil(event.getAmount()), source.getDamageType(), bl);
         }
     }
 
