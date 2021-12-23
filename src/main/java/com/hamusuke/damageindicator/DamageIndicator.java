@@ -31,8 +31,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(DamageIndicator.MOD_ID)
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
-    public static final float NORMAL = 1.0F;
-    public static final float CRITICAL = 2.0F;
+
 
     public DamageIndicator() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CONFIG);
@@ -52,7 +51,7 @@ public class DamageIndicator {
         if (!event.isCanceled() && livingEntity instanceof LivingEntityInvoker) {
             float amount = Math.min(livingEntity.getMaxHealth() - livingEntity.getHealth(), event.getAmount());
             if (!livingEntity.level.isClientSide && amount > 0.0F) {
-                ((LivingEntityInvoker) livingEntity).send(new StringTextComponent("+" + MathHelper.ceil(amount)), "heal", NORMAL);
+                ((LivingEntityInvoker) livingEntity).send(new StringTextComponent("+" + MathHelper.ceil(amount)), "heal", false);
             }
         }
     }
@@ -83,17 +82,17 @@ public class DamageIndicator {
         if (!livingEntity.level.isClientSide && livingEntity instanceof LivingEntityInvoker) {
             LivingEntityInvoker invoker = (LivingEntityInvoker) livingEntity;
             DamageSource source = event.getSource();
-            float scaleMul = NORMAL;
+            boolean bl = false;
 
             Entity entity = source.getEntity();
             if (entity instanceof LivingEntityInvoker) {
                 LivingEntityInvoker livingEntityInvoker = (LivingEntityInvoker) entity;
                 if (livingEntityInvoker.isCritical()) {
-                    scaleMul = CRITICAL;
+                    bl = true;
                     livingEntityInvoker.setCritical(false);
                 }
             }
-            invoker.send(new StringTextComponent("" + MathHelper.ceil(event.getAmount())), source.getMsgId(), scaleMul);
+            invoker.send(new StringTextComponent("" + MathHelper.ceil(event.getAmount())), source.getMsgId(), bl);
         }
     }
 }

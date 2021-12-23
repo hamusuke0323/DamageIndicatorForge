@@ -16,15 +16,15 @@ public class DamageIndicatorPacket implements Packet {
     private final double z;
     private final ITextComponent text;
     private final String source;
-    private final float scaleMultiplier;
+    private final boolean crit;
 
-    public DamageIndicatorPacket(double x, double y, double z, ITextComponent text, String source, float scaleMultiplier) {
+    public DamageIndicatorPacket(double x, double y, double z, ITextComponent text, String source, boolean crit) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.text = text;
         this.source = source;
-        this.scaleMultiplier = scaleMultiplier;
+        this.crit = crit;
     }
 
     public DamageIndicatorPacket(PacketBuffer packetByteBuf) {
@@ -33,7 +33,7 @@ public class DamageIndicatorPacket implements Packet {
         this.z = packetByteBuf.readDouble();
         this.text = packetByteBuf.readComponent();
         this.source = packetByteBuf.readUtf();
-        this.scaleMultiplier = packetByteBuf.readFloat();
+        this.crit = packetByteBuf.readBoolean();
     }
 
     @Override
@@ -43,14 +43,14 @@ public class DamageIndicatorPacket implements Packet {
         packetByteBuf.writeDouble(this.z);
         packetByteBuf.writeComponent(this.text);
         packetByteBuf.writeUtf(this.source);
-        packetByteBuf.writeFloat(this.scaleMultiplier);
+        packetByteBuf.writeBoolean(this.crit);
     }
 
     @Override
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         MutableBoolean mutableBoolean = new MutableBoolean();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            DamageIndicatorClient.getInstance().addRenderer(this.x, this.y, this.z, this.text, this.source, this.scaleMultiplier);
+            DamageIndicatorClient.getInstance().addRenderer(this.x, this.y, this.z, this.text, this.source, this.crit);
             mutableBoolean.setTrue();
         });
         contextSupplier.get().setPacketHandled(mutableBoolean.booleanValue());

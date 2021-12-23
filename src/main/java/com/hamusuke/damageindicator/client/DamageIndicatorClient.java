@@ -85,10 +85,10 @@ public class DamageIndicatorClient {
         }
     }
 
-    public void addRenderer(double x, double y, double z, ITextComponent text, String source, float scaleMul) {
+    public void addRenderer(double x, double y, double z, ITextComponent text, String source, boolean crit) {
         float distance = (float) mc.gameRenderer.getMainCamera().getPosition().distanceTo(new Vector3d(x, y, z));
         if (distance <= (float) Config.CLIENT.renderDistance.get()) {
-            this.queue.add(new IndicatorRenderer(x, y, z, text, source, distance, scaleMul));
+            this.queue.add(new IndicatorRenderer(x, y, z, text, source, crit, distance));
         }
     }
 

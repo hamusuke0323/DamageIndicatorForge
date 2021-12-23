@@ -19,6 +19,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class IndicatorRenderer {
     private static final AxisAlignedBB EMPTY_BOUNDING_BOX = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+    protected static final float NORMAL = 1.0F;
+    protected static final float CRITICAL = 2.0F;
     protected double prevPosX;
     protected double prevPosY;
     protected double prevPosZ;
@@ -39,6 +41,7 @@ public class IndicatorRenderer {
     protected float g;
     protected final ITextComponent text;
     protected final String source;
+    protected final boolean crit;
     protected int color;
     protected float textWidth = -1.0F;
     protected long startedTickingTimeMs;
@@ -48,7 +51,7 @@ public class IndicatorRenderer {
     protected boolean paused;
     protected long passedTimeMs;
 
-    public IndicatorRenderer(double x, double y, double z, ITextComponent text, String source, float distance, float scaleMultiplier) {
+    public IndicatorRenderer(double x, double y, double z, ITextComponent text, String source, boolean crit, float distance) {
         this.boundingBox = EMPTY_BOUNDING_BOX;
         this.spacingXZ = 0.6F;
         this.spacingY = 1.8F;
@@ -62,9 +65,10 @@ public class IndicatorRenderer {
         this.gravityStrength = -0.2F;
         this.text = text;
         this.source = source;
+        this.crit = crit;
         this.syncColorWithConfig();
         this.distance = distance;
-        this.scaleMultiplier = MathHelper.clamp(scaleMultiplier, 1.0F, 2.0F);
+        this.scaleMultiplier = this.crit ? CRITICAL : NORMAL;
         this.startedTickingTimeMs = Util.getMillis();
     }
 
@@ -153,7 +157,7 @@ public class IndicatorRenderer {
     }
 
     public void syncColorWithConfig() {
-        this.color = Config.CLIENT.colorConfig.getRGBFromDamageSource(this.source);
+        this.color = Config.CLIENT.colorConfig.getRGBFromDamageSource(Config.CLIENT.changeColorWhenCrit.get() && this.crit ? "critical" : this.source);
     }
 
     protected void setBoundingBoxSpacing(float spacingXZ, float spacingY) {

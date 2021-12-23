@@ -31,22 +31,19 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     @Shadow
     public abstract boolean isDeadOrDying();
 
-    @Shadow
-    protected float lastHurt;
-
     @Inject(method = "hurt", at = @At("RETURN"))
     private void damage(DamageSource p_21016_, float p_21017_, CallbackInfoReturnable<Boolean> cir) {
         if (!((Object) this instanceof PlayerEntity) && !((Object) this instanceof ShulkerEntity) && !((Object) this instanceof WitherEntity)) {
-            if (!this.level.isClientSide && !cir.getReturnValue() && !this.isDeadOrDying() && (float) this.invulnerableTime <= 10.0F && p_21017_ > this.lastHurt) {
+            if (!this.level.isClientSide && !cir.getReturnValue() && !this.isDeadOrDying()) {
                 this.sendImmune();
             }
         }
     }
 
     @Override
-    public void send(ITextComponent text, String source, float scaleMul) {
+    public void send(ITextComponent text, String source, boolean crit) {
         if (!this.level.isClientSide) {
-            DamageIndicatorPacket damageIndicatorPacket = new DamageIndicatorPacket(this.getRandomX(0.5D), this.getY(MathHelper.nextDouble(this.random, 0.5D, 1.2D)), this.getRandomZ(0.5D), text, source, scaleMul);
+            DamageIndicatorPacket damageIndicatorPacket = new DamageIndicatorPacket(this.getRandomX(0.5D), this.getY(MathHelper.nextDouble(this.random, 0.5D, 1.2D)), this.getRandomZ(0.5D), text, source, crit);
             ((ServerWorld) this.level).players().forEach(serverPlayerEntity -> NetworkManager.sendToClient(damageIndicatorPacket, serverPlayerEntity));
         }
     }

@@ -3,6 +3,7 @@
   "key.damageindicator.hideIndicator.desc": "Hide Damage Indicator",
   "key.damageindicator.category.indicator": "Damage Indicator",
   "options.damageindicator.hideIndicator": "Hide Damage Indicator",
+  "options.damageindicator.changeColorWhenCrit": "Change color when critical",
   "options.damageindicator.displayDistance": "Max distance to show indicator",
   "damageindicator.config.colorConfig.title": "Color Settings",
   "damageindicator.config.color.in_fire_damage": "In Fire Damage",
@@ -26,6 +27,7 @@
   "damageindicator.config.color.dragon_breath_damage": "Dragon Breath Damage",
   "damageindicator.config.color.dry_out_damage": "Dry Out Damage",
   "damageindicator.config.color.sweet_berry_bush_damage": "Sweet Berry Bush Damage",
+  "damageindicator.config.color.critical": "Critical",
   "damageindicator.config.color.heal": "Heal",
   "damageindicator.config.color.immune": "Immune"
 }
