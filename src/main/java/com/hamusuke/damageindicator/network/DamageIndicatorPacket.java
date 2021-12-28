@@ -5,9 +5,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class DamageIndicatorPacket implements IMessage {
-    private double x;
-    private double y;
-    private double z;
+    private int entityId;
     private String text = "";
     private String source = "generic";
     private boolean crit;
@@ -15,10 +13,8 @@ public class DamageIndicatorPacket implements IMessage {
     public DamageIndicatorPacket() {
     }
 
-    public DamageIndicatorPacket(double x, double y, double z, String text, String source, boolean crit) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public DamageIndicatorPacket(int entityId, String text, String source, boolean crit) {
+        this.entityId = entityId;
         this.text = text;
         this.source = source;
         this.crit = crit;
@@ -26,9 +22,7 @@ public class DamageIndicatorPacket implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        this.x = buf.readDouble();
-        this.y = buf.readDouble();
-        this.z = buf.readDouble();
+        this.entityId = buf.readInt();
         this.text = ByteBufUtils.readUTF8String(buf);
         this.source = ByteBufUtils.readUTF8String(buf);
         this.crit = buf.readBoolean();
@@ -36,24 +30,14 @@ public class DamageIndicatorPacket implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeDouble(this.x);
-        buf.writeDouble(this.y);
-        buf.writeDouble(this.z);
+        buf.writeInt(this.entityId);
         ByteBufUtils.writeUTF8String(buf, this.text);
         ByteBufUtils.writeUTF8String(buf, this.source);
         buf.writeBoolean(this.crit);
     }
 
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
+    public int getEntityId() {
+        return this.entityId;
     }
 
     public String getText() {

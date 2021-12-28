@@ -4,6 +4,7 @@ import com.hamusuke.damageindicator.client.DamageIndicatorClient;
 import com.hamusuke.damageindicator.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -81,7 +82,9 @@ public class IndicatorRenderer {
 
     public void render(float tickDelta) {
         Minecraft client = FMLClientHandler.instance().getClient();
-        if (client.getRenderManager().renderViewEntity == null) {
+        Entity renderViewEntity = client.getRenderManager().renderViewEntity;
+
+        if (renderViewEntity == null) {
             this.markDead();
             return;
         }

@@ -1,7 +1,7 @@
 package com.hamusuke.damageindicator.config;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.hamusuke.damageindicator.DamageIndicator;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -9,14 +9,19 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import java.awt.*;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Config(modid = DamageIndicator.MOD_ID, category = "client")
 public class ClientConfig {
+    public static boolean forceIndicatorRendering;
     public static int renderDistance = 64;
     public static boolean changeColorWhenCrit;
 
     public static void sync(Configuration config) {
+        Property forceIndicatorRendering = config.get("client", "forceIndicatorRendering", false);
+        ClientConfig.forceIndicatorRendering = forceIndicatorRendering.getBoolean(false);
+
         Property renderDistance = config.get("client", "renderDistance", 64);
         renderDistance.setHasSlidingControl(true);
         renderDistance.setMaxValue(256);
@@ -37,7 +42,7 @@ public class ClientConfig {
     @Config(modid = DamageIndicator.MOD_ID, category = "client.color")
     public static class ColorConfig {
         @Config.Ignore
-        private static final List<RGB> configs = Lists.newArrayList();
+        private static final Set<RGB> configs = Sets.newHashSet();
         public static RGB inFireDamage = register("infiredamage", 255, 150, 0);
         public static RGB lightningBoltDamage = register("lightningboltdamage", 255, 80, 255);
         public static RGB onFireDamage = register("onfiredamage", 255, 150, 0);
@@ -138,6 +143,24 @@ public class ClientConfig {
                     blue.setValue(old.get("blue").getInt(this.blue));
                     this.sync(config);
                 }
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+
+                return this.name.equals(((RGB) o).name);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(this.name);
             }
         }
     }

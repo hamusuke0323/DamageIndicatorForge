@@ -28,7 +28,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public IMessage onMessage(DamageIndicatorPacket packet, MessageContext context) {
-        DamageIndicatorClient.getInstance().addRenderer(packet.getX(), packet.getY(), packet.getZ(), packet.getText(), packet.getSource(), packet.isCrit());
+        DamageIndicatorClient.getInstance().addRenderer(packet.getEntityId(), packet.getText(), packet.getSource(), packet.isCrit());
         return null;
     }
 }

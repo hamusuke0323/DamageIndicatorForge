@@ -1,34 +1,30 @@
 package com.hamusuke.damageindicator;
 
+import com.hamusuke.criticalib.invoker.EntityLivingBaseInvoker;
 import com.hamusuke.damageindicator.invoker.LivingEntityInvoker;
 import com.hamusuke.damageindicator.network.NetworkManager;
 import com.hamusuke.damageindicator.proxy.CommonProxy;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION, guiFactory = "com.hamusuke." + DamageIndicator.MOD_ID + ".client.gui.screen.ConfigScreenFactory", updateJSON = "https://raw.githubusercontent.com/hamusuke0323/DamageIndicatorForge/update/update.json")
+@Mod(modid = DamageIndicator.MOD_ID, name = DamageIndicator.MOD_NAME, version = DamageIndicator.VERSION, guiFactory = "com.hamusuke." + DamageIndicator.MOD_ID + ".client.gui.screen.ConfigScreenFactory", updateJSON = "https://raw.githubusercontent.com/hamusuke0323/DamageIndicatorForge/update/update.json", dependencies = "required-after:criticalib@[1.0.2,);")
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
     public static final String MOD_NAME = "Damage Indicator";
-    public static final String VERSION = "1.1.2";
+    public static final String VERSION = "2.0.1";
     public static final Logger LOGGER = LogManager.getLogger();
     @SidedProxy(clientSide = "com.hamusuke.damageindicator.proxy.ClientProxy", serverSide = "com.hamusuke.damageindicator.proxy.CommonProxy")
     public static CommonProxy PROXY;
@@ -44,26 +40,6 @@ public class DamageIndicator {
         }
 
         PROXY.onConfigChanged(config);
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onCritHitLast(final CriticalHitEvent event) {
-        LivingEntityInvoker invoker = (LivingEntityInvoker) event.getEntityPlayer();
-        if (!event.getEntityPlayer().world.isRemote && !invoker.isCritical()) {
-            invoker.setCritical(event.getResult() == Event.Result.ALLOW || (event.isVanillaCritical() && event.getResult() == Event.Result.DEFAULT));
-        }
-    }
-
-    @SubscribeEvent
-    public void onHurt(final LivingHurtEvent event) {
-        EntityLivingBase livingEntity = event.getEntityLiving();
-        if (!livingEntity.world.isRemote) {
-            DamageSource source = event.getSource();
-            if (source instanceof EntityDamageSourceIndirect && source.getTrueSource() instanceof LivingEntityInvoker && source.getImmediateSource() instanceof EntityArrow) {
-                LivingEntityInvoker livingEntityInvoker = (LivingEntityInvoker) source.getTrueSource();
-                livingEntityInvoker.setCritical(((EntityArrow) source.getImmediateSource()).getIsCritical());
-            }
-        }
     }
 
     @Mod.EventHandler
@@ -90,19 +66,14 @@ public class DamageIndicator {
     public void onDamageLast(final LivingDamageEvent event) {
         EntityLivingBase livingEntity = event.getEntityLiving();
         if (!livingEntity.world.isRemote && livingEntity instanceof LivingEntityInvoker) {
-            LivingEntityInvoker invoker = (LivingEntityInvoker) livingEntity;
             DamageSource source = event.getSource();
             boolean bl = false;
 
             Entity entity = source.getTrueSource();
             if (entity instanceof LivingEntityInvoker) {
-                LivingEntityInvoker livingEntityInvoker = (LivingEntityInvoker) entity;
-                if (livingEntityInvoker.isCritical()) {
-                    bl = true;
-                    livingEntityInvoker.setCritical(false);
-                }
+                bl = ((EntityLivingBaseInvoker) entity).isCritical();
             }
-            invoker.send("" + MathHelper.ceil(event.getAmount()), source.getDamageType(), bl);
+            ((LivingEntityInvoker) livingEntity).send("" + MathHelper.ceil(event.getAmount()), source.getDamageType(), bl);
         }
     }
 

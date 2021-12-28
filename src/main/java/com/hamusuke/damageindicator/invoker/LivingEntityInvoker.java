@@ -2,12 +2,10 @@ package com.hamusuke.damageindicator.invoker;
 
 import net.minecraft.client.resources.I18n;
 
-public interface LivingEntityInvoker {
-    default boolean isDeadOrDying() {
-        return false;
-    }
+import java.util.Random;
 
-    default boolean isCritical() {
+public interface LivingEntityInvoker {
+    default boolean canSendImmune(float amount) {
         return false;
     }
 
@@ -18,6 +16,11 @@ public interface LivingEntityInvoker {
         this.send(I18n.format("damageindicator.indicator.immune"), "immune", false);
     }
 
-    default void setCritical(boolean critical) {
-    }
+    Random getRandom();
+
+    double getRandomX(double scale);
+
+    double getRandomY(double scale);
+
+    double getRandomZ(double scale);
 }
