@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 public class DamageIndicator {
     public static final String MOD_ID = "damageindicator";
     public static final String MOD_NAME = "Damage Indicator";
-    public static final String VERSION = "2.0.1";
+    public static final String VERSION = "2.0.2";
     public static final Logger LOGGER = LogManager.getLogger();
     @SidedProxy(clientSide = "com.hamusuke.damageindicator.proxy.ClientProxy", serverSide = "com.hamusuke.damageindicator.proxy.CommonProxy")
     public static CommonProxy PROXY;

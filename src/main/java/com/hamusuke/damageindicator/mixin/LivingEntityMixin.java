@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
@@ -35,7 +36,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     }
 
     @Inject(method = "onEntityUpdate", at = @At("TAIL"))
-    private void tick() {
+    private void tick(CallbackInfo ci) {
         if (this.showImmuneCoolTime > 0) {
             this.showImmuneCoolTime--;
         }
@@ -43,8 +44,10 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
 
     @Inject(method = "attackEntityFrom", at = @At("RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!this.world.isRemote && !cir.getReturnValueZ() && this.canSendImmune(amount)) {
-            this.sendImmune();
+        if (!((Object) this instanceof EntityPlayer) && !((Object) this instanceof EntityShulker) && !((Object) this instanceof EntityWither)) {
+            if (!this.world.isRemote && !cir.getReturnValueZ() && this.canSendImmune(amount)) {
+                this.sendImmune();
+            }
         }
     }
 
@@ -81,6 +84,6 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
 
     @Override
     public boolean canSendImmune(float amount) {
-        return !((Object) this instanceof EntityPlayer) && !((Object) this instanceof EntityShulker) && !((Object) this instanceof EntityWither) && this.getHealth() > 0.0F && this.showImmuneCoolTime <= 0 && !((float) this.hurtResistantTime > (float) this.maxHurtResistantTime / 2.0F && amount <= this.lastDamage);
+        return this.getHealth() > 0.0F && this.showImmuneCoolTime <= 0 && !((float) this.hurtResistantTime > (float) this.maxHurtResistantTime / 2.0F && amount <= this.lastDamage);
     }
 }
