@@ -21,9 +21,9 @@ public class ConfigScreen extends GuiConfig {
     }
 
     private static List<IConfigElement> getConfigElements() {
-        List<IConfigElement> client = Lists.newArrayList();
-        client.add(new DummyConfigElement.DummyCategoryElement("client", DamageIndicator.MOD_ID + ".category.clientsettings", Client.class));
-        return client;
+        List<IConfigElement> clients = Lists.newArrayList();
+        clients.add(new DummyConfigElement.DummyCategoryElement("client", DamageIndicator.MOD_ID + ".category.clientsettings", Client.class));
+        return clients;
     }
 
     @Override

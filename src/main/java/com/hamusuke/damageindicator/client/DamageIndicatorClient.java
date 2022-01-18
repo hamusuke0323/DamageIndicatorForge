@@ -73,7 +73,7 @@ public class DamageIndicatorClient {
     }
 
     public void syncIndicatorColor() {
-        this.queue.forEach(IndicatorRenderer::syncColorFromConfig);
+        this.queue.forEach(IndicatorRenderer::syncIndicatorColor);
     }
 
     public static DamageIndicatorClient getInstance() {

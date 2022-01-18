@@ -16,7 +16,7 @@ public abstract class ShulkerEntityMixin extends LivingEntityMixin {
 
     @Inject(method = "attackEntityFrom", at = @At("RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!this.world.isRemote && this.canSendImmune(amount) && !cir.getReturnValue()) {
+        if (!this.world.isRemote && this.canSendImmune(amount) && !cir.getReturnValueZ()) {
             this.sendImmune();
         }
     }

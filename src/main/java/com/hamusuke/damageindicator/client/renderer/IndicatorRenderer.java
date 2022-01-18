@@ -60,7 +60,7 @@ public class IndicatorRenderer {
         this.text = text;
         this.damageSourceType = damageSourceType;
         this.crit = crit;
-        this.syncColorFromConfig();
+        this.syncIndicatorColor();
         this.distance = distance;
         this.scaleMultiplier = this.crit ? DamageIndicatorClient.CRITICAL : DamageIndicatorClient.NORMAL;
         this.startedTickingTimeMs = System.currentTimeMillis();
@@ -161,7 +161,7 @@ public class IndicatorRenderer {
         return start + delta * (end - start);
     }
 
-    public void syncColorFromConfig() {
+    public void syncIndicatorColor() {
         this.color = ClientConfig.ColorConfig.getColorFromDamageSourceType(ClientConfig.changeColorWhenCrit && this.crit ? "critical" : this.damageSourceType);
     }
 
