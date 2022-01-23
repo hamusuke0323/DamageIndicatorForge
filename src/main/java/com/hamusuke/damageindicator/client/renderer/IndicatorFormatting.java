@@ -1,4 +1,4 @@
-package com.hamusuke.damageindicator.client.indicatorformat;
+package com.hamusuke.damageindicator.client.renderer;
 
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
