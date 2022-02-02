@@ -28,7 +28,7 @@ public class ClientConfig {
 
         Property renderDistance = config.get("client", "renderDistance", 64);
         renderDistance.setHasSlidingControl(true);
-        renderDistance.setMaxValue(256);
+        renderDistance.setMaxValue(1024);
         renderDistance.setMinValue(0);
         ClientConfig.renderDistance = renderDistance.getInt(64);
 

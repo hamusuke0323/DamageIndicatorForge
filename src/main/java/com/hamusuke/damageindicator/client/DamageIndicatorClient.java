@@ -22,7 +22,7 @@ import java.util.Queue;
 @SideOnly(Side.CLIENT)
 public class DamageIndicatorClient {
     public static final float NORMAL = 1.0F;
-    public static final float CRITICAL = 2.0F;
+    public static final float CRITICAL = 2.5F;
     private static final Minecraft mc = Minecraft.getMinecraft();
     private final Queue<IndicatorRenderer> queue = Queues.newLinkedBlockingDeque();
     private static DamageIndicatorClient instance;
