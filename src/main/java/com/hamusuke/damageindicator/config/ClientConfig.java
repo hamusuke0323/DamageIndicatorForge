@@ -14,15 +14,11 @@ import java.util.Set;
 
 @Config(modid = DamageIndicator.MOD_ID, category = "client")
 public class ClientConfig {
-    public static String indicatorTextFormat = "%int_value";
     public static boolean forceIndicatorRendering;
     public static int renderDistance = 64;
     public static boolean changeColorWhenCrit;
 
     public static void sync(Configuration config) {
-        //Property indicatorTextFormat = config.get("client", "indicatorTextFormat", "%int_value");
-        //ClientConfig.indicatorTextFormat = indicatorTextFormat.getString();
-
         Property forceIndicatorRendering = config.get("client", "forceIndicatorRendering", false);
         ClientConfig.forceIndicatorRendering = forceIndicatorRendering.getBoolean(false);
 

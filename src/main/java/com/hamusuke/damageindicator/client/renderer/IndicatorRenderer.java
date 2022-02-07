@@ -60,22 +60,22 @@ public class IndicatorRenderer {
         } else if (this.age > maxAge / 2) {
             this.velocity += 0.008F;
             this.velocity *= 0.98F;
-            this.moveOnRadius(this.velocity);
+            this.moveOnHypotenuse3d(this.velocity);
         } else {
             if (this.currentScale != this.currentScale) {
                 this.calculateScale(mc.isGamePaused());
             }
 
-            this.moveOnRadius(this.currentScale * 0.5F);
+            this.moveOnHypotenuse3d(this.currentScale * (10.0F / (float) maxAge));
         }
     }
 
-    private void moveOnRadius(float amountToMove) {
+    private void moveOnHypotenuse3d(float lengthOfHypotenuseToMove) {
         float[] yawPitch = this.calculateAngle();
         float phi = yawPitch[0] * 0.017453292F;
         float theta = yawPitch[1] * 0.017453292F;
-        float radius2d = amountToMove * MathHelper.sin(theta);
-        this.setPos(this.x + radius2d * MathHelper.sin(phi), this.y + amountToMove * MathHelper.cos(theta), this.z + radius2d * MathHelper.cos(phi));
+        float hypotenuse2d = lengthOfHypotenuseToMove * MathHelper.sin(theta);
+        this.setPos(this.x + hypotenuse2d * MathHelper.sin(phi), this.y + lengthOfHypotenuseToMove * MathHelper.cos(theta), this.z + hypotenuse2d * MathHelper.cos(phi));
     }
 
     private float[] calculateAngle() {
@@ -111,18 +111,18 @@ public class IndicatorRenderer {
             GlStateManager.depthMask(false);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            int l = 255;
+            int alpha = 255;
             if (this.age > maxAge / 2) {
-                l = (int) ((((float) (maxAge + 1) / (float) this.age) - 1.0F) * 255.0F);
+                alpha = (int) (((float) (maxAge + 1) / (float) this.age - 1.0F) * 255.0F);
             }
-            l = MathHelper.clamp(l, 0, 255);
+            alpha = MathHelper.clamp(alpha, 0, 255);
 
             int color = this.color;
             if (this.age <= 3) {
-                color /= 255.0D / AdditionalMathHelper.lerp(MathHelper.clamp((System.currentTimeMillis() - this.startedTickingTimeMs) / 150.0F, 0.0F, 1.0F), 1, 255);
+                color = AdditionalMathHelper.lerpColor((System.currentTimeMillis() - this.startedTickingTimeMs) / (7.5F * (float) maxAge), color);
             }
 
-            mc.fontRenderer.drawString(this.text, -this.textWidth / 2, -mc.fontRenderer.FONT_HEIGHT / 2, color + (l << 24));
+            mc.fontRenderer.drawString(this.text, -this.textWidth / 2, -mc.fontRenderer.FONT_HEIGHT / 2, color + (alpha << 24));
             GlStateManager.disableBlend();
             GlStateManager.enableDepth();
             GlStateManager.depthMask(true);
@@ -132,7 +132,7 @@ public class IndicatorRenderer {
 
     private float calculateScale(boolean isPaused) {
         long timeDelta = System.currentTimeMillis() - this.startedTickingTimeMs;
-        float scale = AdditionalMathHelper.convexUpwardFunction2d(MathHelper.clamp(timeDelta / 250.0F, 0.0F, 1.0F), this.crit ? -0.2F : -0.5F, this.crit ? 2.0F : 0.5F, 0.00375F * this.distance * 1.732050807F * this.scaleMultiplier, 0.0075F * this.distance * 1.732050807F * this.scaleMultiplier * this.scaleMultiplier);
+        float scale = AdditionalMathHelper.convexUpwardQuadraticFunction(MathHelper.clamp(timeDelta / (12.5F * (float) maxAge), 0.0F, 1.0F), this.crit ? -0.2F : -0.5F, this.crit ? 2.0F : 0.5F, 0.00375F * this.distance * 1.732050807F * this.scaleMultiplier, 0.0075F * this.distance * 1.732050807F * this.scaleMultiplier * this.scaleMultiplier * (this.crit ? 1.0F : 0.8F));
         scale -= 0.00025 * this.textWidth;
         scale = MathHelper.clamp(scale, 0.0001F, Float.MAX_VALUE);
 
