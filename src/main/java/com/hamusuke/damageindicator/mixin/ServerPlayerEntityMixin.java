@@ -1,7 +1,6 @@
 package com.hamusuke.damageindicator.mixin;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
@@ -18,7 +17,7 @@ public abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 
     @Inject(method = "hurt", at = @At("RETURN"))
     private void damage(DamageSource p_9037_, float p_9038_, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue() && !((LivingEntity) (Object) this).isDeadOrDying()) {
+        if (!cir.getReturnValueZ() && this.canSendImmune(p_9038_)) {
             this.sendImmune();
         }
     }

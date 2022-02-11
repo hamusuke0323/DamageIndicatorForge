@@ -9,6 +9,11 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -44,7 +49,7 @@ public class DamageIndicatorClient {
 
     private void onConfigReload(final ModConfig.Reloading event) {
         if (event.getConfig().getModId().equals(DamageIndicator.MOD_ID)) {
-            this.queue.forEach(IndicatorRenderer::syncColorWithConfig);
+            this.queue.forEach(IndicatorRenderer::syncIndicatorColor);
         }
     }
 
@@ -85,10 +90,21 @@ public class DamageIndicatorClient {
         }
     }
 
-    public void addRenderer(double x, double y, double z, ITextComponent text, String source, boolean crit) {
-        float distance = (float) mc.gameRenderer.getMainCamera().getPosition().distanceTo(new Vector3d(x, y, z));
-        if (distance <= (float) Config.CLIENT.renderDistance.get()) {
-            this.queue.add(new IndicatorRenderer(x, y, z, text, source, crit, distance));
+    public void addRenderer(int entityId, ITextComponent text, String source, boolean crit) {
+        if (mc.level != null && mc.player != null) {
+            Entity clientEntity = mc.level.getEntity(entityId);
+
+            if (clientEntity instanceof LivingEntity) {
+                double x = clientEntity.getRandomX(0.5D);
+                double y = clientEntity.getY(MathHelper.nextDouble(((LivingEntity) clientEntity).getRandom(), 0.5D, 1.2D));
+                double z = clientEntity.getRandomZ(0.5D);
+                Vector3d vector3d = new Vector3d(x, y, z);
+                float distance = (float) mc.gameRenderer.getMainCamera().getPosition().distanceTo(vector3d);
+                RayTraceResult result = mc.level.clip(new RayTraceContext(mc.player.position(), vector3d, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, null));
+                if ((Config.CLIENT.forceIndicatorRendering.get() || result.getType() == RayTraceResult.Type.MISS) && distance <= (float) Config.CLIENT.renderDistance.get()) {
+                    this.queue.add(new IndicatorRenderer(x, y, z, text, source, crit, distance));
+                }
+            }
         }
     }
 

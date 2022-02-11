@@ -4,7 +4,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public interface LivingEntityInvoker {
-    default boolean isCritical() {
+    default boolean canSendImmune(float amount) {
         return false;
     }
 
@@ -13,8 +13,5 @@ public interface LivingEntityInvoker {
 
     default void sendImmune() {
         this.send(new TranslationTextComponent("damageindicator.indicator.immune"), "immune", false);
-    }
-
-    default void setCritical(boolean critical) {
     }
 }

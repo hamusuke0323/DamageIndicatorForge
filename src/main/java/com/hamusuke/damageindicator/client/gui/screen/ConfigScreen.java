@@ -24,6 +24,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ConfigScreen extends Screen {
     private static final ITextComponent HIDE_INDICATOR = new TranslationTextComponent("options.damageindicator.hideIndicator");
+    private static final ITextComponent FORCE_INDICATOR_RENDERING = new TranslationTextComponent("options.damageindicator.forceindicatorrendering");
     private static final ITextComponent CHANGE_COLOR_WHEN_CRIT = new TranslationTextComponent("options.damageindicator.changeColorWhenCrit");
     private final Screen parent;
 
@@ -34,12 +35,17 @@ public class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        this.addButton(new Button(this.width / 4, this.height / 2 - 40, this.width / 2, 20, DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()), p_onPress_1_ -> {
+        this.addButton(new Button(this.width / 4, this.height / 2 - 50, this.width / 2, 20, DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()), p_onPress_1_ -> {
             Config.CLIENT.hideIndicator.set(!Config.CLIENT.hideIndicator.get());
             p_onPress_1_.setMessage(DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()));
         }));
 
-        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 20, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 256.0D) {
+        this.addButton(new Button(this.width / 4, this.height / 2 - 30, this.width / 2, 20, DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()), p_onPress_1_ -> {
+            Config.CLIENT.forceIndicatorRendering.set(!Config.CLIENT.forceIndicatorRendering.get());
+            p_onPress_1_.setMessage(DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()));
+        }));
+
+        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 10, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 256.0D) {
             @Override
             protected void updateMessage() {
                 this.setMessage(new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()));
@@ -51,12 +57,12 @@ public class ConfigScreen extends Screen {
             }
         });
 
-        this.addButton(new Button(this.width / 4, this.height / 2, this.width / 2, 20, DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()), p_onPress_1_ -> {
+        this.addButton(new Button(this.width / 4, this.height / 2 + 10, this.width / 2, 20, DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()), p_onPress_1_ -> {
             Config.CLIENT.changeColorWhenCrit.set(!Config.CLIENT.changeColorWhenCrit.get());
             p_onPress_1_.setMessage(DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()));
         }));
 
-        this.addButton(new Button(this.width / 4, this.height / 2 + 20, this.width / 2, 20, new TranslationTextComponent(DamageIndicator.MOD_ID + ".config.colorConfig.title"), p_onPress_1_ -> this.minecraft.setScreen(new ColorSettingsScreen(this))));
+        this.addButton(new Button(this.width / 4, this.height / 2 + 30, this.width / 2, 20, new TranslationTextComponent(DamageIndicator.MOD_ID + ".config.colorConfig.title"), p_onPress_1_ -> this.minecraft.setScreen(new ColorSettingsScreen(this))));
 
         this.addButton(new Button(this.width / 4, this.height - 20, this.width / 2, 20, DialogTexts.GUI_DONE, p_onPress_1_ -> this.onClose()));
     }

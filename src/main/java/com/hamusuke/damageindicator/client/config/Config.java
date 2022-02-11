@@ -20,13 +20,17 @@ public class Config {
 
     public static class ClientConfig {
         public final ForgeConfigSpec.BooleanValue hideIndicator;
+        public final ForgeConfigSpec.BooleanValue forceIndicatorRendering;
         public final ForgeConfigSpec.IntValue renderDistance;
+        public final ForgeConfigSpec.BooleanValue changeColorWhenCrit;
         public final ColorConfig colorConfig;
 
         public ClientConfig(ForgeConfigSpec.Builder builder) {
             builder.push("client");
             this.hideIndicator = builder.define("hide_indicator", false);
-            this.renderDistance = builder.defineInRange("render_distance", 64, 0, 256);
+            this.forceIndicatorRendering = builder.define("force_indicator_rendering", false);
+            this.renderDistance = builder.defineInRange("render_distance", 64, 0, 1024);
+            this.changeColorWhenCrit = builder.define("change_color_when_crit", false);
             this.colorConfig = new ColorConfig(builder);
             builder.pop();
         }
@@ -54,6 +58,7 @@ public class Config {
             public final RGB dragonBreathDamage;
             public final RGB dryOutDamage;
             public final RGB sweetBerryBushDamage;
+            public final RGB critical;
             public final RGB heal;
             public final RGB immune;
 
@@ -107,6 +112,7 @@ public class Config {
                 this.dragonBreathDamage = this.register(builder, "dragon_breath_damage");
                 this.dryOutDamage = this.register(builder, "dry_out_damage");
                 this.sweetBerryBushDamage = this.register(builder, "sweet_berry_bush_damage");
+                this.critical = this.register(builder, "critical", 255, 255, 0);
                 this.heal = register(builder, "heal", 85, 255, 85);
                 this.immune = register(builder, "immune", 170, 170, 170);
                 builder.pop();

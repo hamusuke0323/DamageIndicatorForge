@@ -1,7 +1,6 @@
 package com.hamusuke.damageindicator.mixin;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.ShulkerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
@@ -18,7 +17,7 @@ public abstract class ShulkerEntityMixin extends LivingEntityMixin {
 
     @Inject(method = "hurt", at = @At("RETURN"))
     private void damage(DamageSource p_33421_, float p_33422_, CallbackInfoReturnable<Boolean> cir) {
-        if (!this.level.isClientSide && !((LivingEntity) (Object) this).isDeadOrDying() && !cir.getReturnValue()) {
+        if (!this.level.isClientSide && this.canSendImmune(p_33422_) && !cir.getReturnValueZ()) {
             this.sendImmune();
         }
     }
