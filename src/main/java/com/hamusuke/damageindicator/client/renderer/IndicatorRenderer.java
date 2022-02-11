@@ -15,9 +15,12 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
 public class IndicatorRenderer {
+    private static final Logger LOGGER = LogManager.getLogger();
     protected static final int maxAge = 20;
     private static final Minecraft mc = Minecraft.getInstance();
     protected static final float NORMAL = 1.0F;
@@ -78,15 +81,14 @@ public class IndicatorRenderer {
     }
 
     private void moveOnHypotenuse3d(float lengthOfHypotenuseToMove) {
-        float[] yawPitch = this.calculateAngle(mc.getEntityRenderDispatcher().camera);
-        float phi = yawPitch[0] * 0.017453292F;
-        float theta = yawPitch[1] * 0.017453292F;
-        float hypotenuse2d = lengthOfHypotenuseToMove * MathHelper.sin(theta);
-        this.setPos(this.x + hypotenuse2d * MathHelper.sin(phi), this.y + lengthOfHypotenuseToMove * MathHelper.cos(theta), this.z + hypotenuse2d * MathHelper.cos(phi));
-    }
-
-    private float[] calculateAngle(ActiveRenderInfo camera) {
-        return mc.options.getCameraType().isMirrored() ? new float[]{-camera.getYRot(), -camera.getXRot()} : new float[]{-camera.getYRot(), camera.getXRot()};
+        if (mc.getEntityRenderDispatcher().camera == null) {
+            this.markDead();
+        } else {
+            float phi = -mc.getEntityRenderDispatcher().camera.getYRot() * 0.017453292F;
+            float theta = mc.getEntityRenderDispatcher().camera.getXRot() * 0.017453292F;
+            float hypotenuse2d = lengthOfHypotenuseToMove * MathHelper.sin(theta);
+            this.setPos(this.x + hypotenuse2d * MathHelper.sin(phi), this.y + lengthOfHypotenuseToMove * MathHelper.cos(theta), this.z + hypotenuse2d * MathHelper.cos(phi));
+        }
     }
 
     public void render(MatrixStack matrix, IRenderTypeBuffer vertexConsumers, ActiveRenderInfo camera, float tickDelta) {
@@ -110,9 +112,8 @@ public class IndicatorRenderer {
 
             matrix.pushPose();
             matrix.translate(x - camX, y - camY, z - camZ);
-            float[] yawPitch = this.calculateAngle(camera);
-            matrix.mulPose(Vector3f.YP.rotationDegrees(yawPitch[0]));
-            matrix.mulPose(Vector3f.XP.rotationDegrees(yawPitch[1]));
+            matrix.mulPose(Vector3f.YP.rotationDegrees(-camera.getYRot()));
+            matrix.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
             matrix.scale(-scale, -scale, scale);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
@@ -128,7 +129,7 @@ public class IndicatorRenderer {
 
             int color = this.color;
             if (this.age <= 3) {
-                color = AdditionalMathHelper.lerpColor((System.currentTimeMillis() - this.startedTickingTimeMs) / (7.5F * (float) maxAge), color);
+                color = AdditionalMathHelper.lerpColor((Util.getMillis() - this.startedTickingTimeMs) / (7.5F * (float) maxAge), color);
             }
 
             textRenderer.drawInBatch(this.text, -textRenderer.width(this.text) / 2.0F, -textRenderer.lineHeight / 2.0F, color + (alpha << 24), false, matrix.last().pose(), vertexConsumers, true, 0, 15728880);

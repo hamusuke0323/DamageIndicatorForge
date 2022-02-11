@@ -16,6 +16,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.widget.Slider;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -45,7 +46,7 @@ public class ConfigScreen extends Screen {
             p_onPress_1_.setMessage(DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()));
         }));
 
-        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 10, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 256.0D) {
+        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 10, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 1024.0D) {
             @Override
             protected void updateMessage() {
                 this.setMessage(new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()));
@@ -53,7 +54,7 @@ public class ConfigScreen extends Screen {
 
             @Override
             protected void applyValue() {
-                Config.CLIENT.renderDistance.set(MathHelper.clamp((int) (this.value * 256.0D), 0, 256));
+                Config.CLIENT.renderDistance.set(MathHelper.clamp((int) (this.value * 1024.0D), 0, 1024));
             }
         });
 
@@ -98,7 +99,9 @@ public class ConfigScreen extends Screen {
         @Override
         protected void init() {
             super.init();
+            double amount = this.list != null ? this.list.getScrollAmount() : 0.0D;
             this.list = new ColorList();
+            this.list.setScrollAmount(amount);
             this.addWidget(this.list);
             this.addButton(new Button(this.width / 2 - this.width / 4, this.height - 20, this.width / 2, 20, DialogTexts.GUI_DONE, p_onPress_1_ -> this.onClose()));
         }
@@ -163,11 +166,11 @@ public class ConfigScreen extends Screen {
             protected void init() {
                 super.init();
 
-                this.red = this.addButton(new Slider(this.width / 4, 20, this.width / 2, 20, ITextComponent.nullToEmpty("Red: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.red.get(), false, true, p_onPress_1_ -> {
+                this.red = this.addButton(new Slider(this.width / 4, this.height / 2 - 70, this.width / 2, 20, ITextComponent.nullToEmpty("Red: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.red.get(), false, true, p_onPress_1_ -> {
                 }));
-                this.green = this.addButton(new Slider(this.width / 4, 45, this.width / 2, 20, ITextComponent.nullToEmpty("Green: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.green.get(), false, true, p_onPress_1_ -> {
+                this.green = this.addButton(new Slider(this.width / 4, this.height / 2 - 45, this.width / 2, 20, ITextComponent.nullToEmpty("Green: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.green.get(), false, true, p_onPress_1_ -> {
                 }));
-                this.blue = this.addButton(new Slider(this.width / 4, 70, this.width / 2, 20, ITextComponent.nullToEmpty("Blue: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.blue.get(), false, true, p_onPress_1_ -> {
+                this.blue = this.addButton(new Slider(this.width / 4, this.height / 2 - 20, this.width / 2, 20, ITextComponent.nullToEmpty("Blue: "), StringTextComponent.EMPTY, 0.0D, 255.0D, this.rgb.blue.get(), false, true, p_onPress_1_ -> {
                 }));
                 this.addButton(new Button(this.width / 2 - this.width / 4, this.height - 20, this.width / 2, 20, DialogTexts.GUI_DONE, p_onPress_1_ -> this.onClose()));
             }
@@ -176,7 +179,21 @@ public class ConfigScreen extends Screen {
             public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
                 this.renderBackground(p_230430_1_);
                 drawCenteredString(p_230430_1_, this.font, this.title, this.width / 2, 5, 16777215);
+                int color = MathHelper.color(this.red.getValueInt(), this.green.getValueInt(), this.blue.getValueInt()) + (255 << 24);
+                this.fillGradient(p_230430_1_, this.width / 4, this.height / 2 + 5, this.width * 3 / 4, this.height - 25, color, color);
                 super.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
+            }
+
+            @Override
+            public boolean mouseReleased(double p_231048_1_, double p_231048_3_, int p_231048_5_) {
+                MutableBoolean mutableBoolean = new MutableBoolean();
+                this.children().forEach(iGuiEventListener -> {
+                    boolean bl = iGuiEventListener.mouseReleased(p_231048_1_, p_231048_3_, p_231048_5_);
+                    if (!mutableBoolean.booleanValue() && bl) {
+                        mutableBoolean.setValue(true);
+                    }
+                });
+                return mutableBoolean.booleanValue() || super.mouseReleased(p_231048_1_, p_231048_3_, p_231048_5_);
             }
 
             @Override
