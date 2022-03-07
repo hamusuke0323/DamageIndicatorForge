@@ -15,12 +15,9 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
 public class IndicatorRenderer {
-    private static final Logger LOGGER = LogManager.getLogger();
     protected static final int maxAge = 20;
     private static final Minecraft mc = Minecraft.getInstance();
     protected static final float NORMAL = 1.0F;

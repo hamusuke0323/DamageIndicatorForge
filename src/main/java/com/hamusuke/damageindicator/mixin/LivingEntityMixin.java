@@ -11,6 +11,7 @@ import net.minecraft.entity.monster.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
@@ -61,7 +62,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     @Override
     public void sendImmune() {
         this.showImmuneCD = 10;
-        LivingEntityInvoker.super.sendImmune();
+        this.send(new TranslationTextComponent("damageindicator.indicator.immune"), "immune", false);
     }
 
     @Override
