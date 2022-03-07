@@ -1,7 +1,5 @@
 package com.hamusuke.damageindicator.invoker;
 
-import net.minecraft.client.resources.I18n;
-
 import java.util.Random;
 
 public interface LivingEntityInvoker {
@@ -13,7 +11,7 @@ public interface LivingEntityInvoker {
     }
 
     default void sendImmune() {
-        this.send(I18n.format("damageindicator.indicator.immune"), "immune", false);
+        this.send("damageindicator.indicator.immune", "immune", false);
     }
 
     Random getRandom();

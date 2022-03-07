@@ -3,6 +3,7 @@ package com.hamusuke.damageindicator.proxy;
 import com.hamusuke.damageindicator.client.DamageIndicatorClient;
 import com.hamusuke.damageindicator.config.ClientConfig;
 import com.hamusuke.damageindicator.network.DamageIndicatorPacket;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -28,7 +29,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public IMessage onMessage(DamageIndicatorPacket packet, MessageContext context) {
-        DamageIndicatorClient.getInstance().addRenderer(packet.getEntityId(), packet.getText(), packet.getSource(), packet.isCrit());
+        DamageIndicatorClient.getInstance().addRenderer(packet.getEntityId(), I18n.format(packet.getText()), packet.getSource(), packet.isCrit());
         return null;
     }
 }
