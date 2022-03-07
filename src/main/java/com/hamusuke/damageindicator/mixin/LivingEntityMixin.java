@@ -79,7 +79,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityIn
     @Override
     public void sendImmune() {
         this.showImmuneCoolTime = 10;
-        LivingEntityInvoker.super.sendImmune();
+        this.send("damageindicator.indicator.immune", "immune", false);
     }
 
     @Override

@@ -11,7 +11,6 @@ public interface LivingEntityInvoker {
     }
 
     default void sendImmune() {
-        this.send("damageindicator.indicator.immune", "immune", false);
     }
 
     Random getRandom();
