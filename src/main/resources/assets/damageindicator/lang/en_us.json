@@ -6,6 +6,7 @@
   "options.damageindicator.forceindicatorrendering": "Forcibly Render Indicator",
   "options.damageindicator.changeColorWhenCrit": "Change color when critical",
   "options.damageindicator.displayDistance": "Max distance to render indicator",
+  "options.damageindicator.fontSize": "Font Size",
   "damageindicator.config.colorConfig.title": "Color Settings",
   "damageindicator.config.color.in_fire_damage": "In Fire Damage",
   "damageindicator.config.color.lightning_bolt_damage": "Lightning Bolt Damage",

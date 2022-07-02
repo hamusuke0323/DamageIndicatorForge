@@ -42,6 +42,7 @@ public class IndicatorRenderer {
     protected float currentScale = Float.NaN;
     protected boolean paused;
     protected long passedTimeMs;
+    protected final float fontSize;
 
     public IndicatorRenderer(double x, double y, double z, ITextComponent text, String source, boolean crit, float distance) {
         this.setPos(x, y, z);
@@ -55,6 +56,7 @@ public class IndicatorRenderer {
         this.distance = distance;
         this.scaleMultiplier = this.crit ? CRITICAL : NORMAL;
         this.startedTickingTimeMs = Util.getMillis();
+        this.fontSize = (float) (double) Config.CLIENT.fontSize.get();
     }
 
     public void tick() {
@@ -99,6 +101,7 @@ public class IndicatorRenderer {
             this.markDead();
         } else {
             float scale = this.calculateScale(mc.isPaused());
+            scale *= this.fontSize;
             double x = MathHelper.lerp(tickDelta, this.prevPosX, this.x);
             double y = MathHelper.lerp(tickDelta, this.prevPosY, this.y);
             double z = MathHelper.lerp(tickDelta, this.prevPosZ, this.z);

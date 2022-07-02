@@ -34,19 +34,23 @@ public class ConfigScreen extends Screen {
         this.parent = parent;
     }
 
+    private static ITextComponent percent(String key, String value) {
+        return new TranslationTextComponent("options.percent_value", key, value);
+    }
+
     @Override
     protected void init() {
-        this.addButton(new Button(this.width / 4, this.height / 2 - 50, this.width / 2, 20, DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()), p_onPress_1_ -> {
+        this.addButton(new Button(this.width / 4, this.height / 2 - 60, this.width / 2, 20, DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()), p_onPress_1_ -> {
             Config.CLIENT.hideIndicator.set(!Config.CLIENT.hideIndicator.get());
             p_onPress_1_.setMessage(DialogTexts.optionStatus(HIDE_INDICATOR, Config.CLIENT.hideIndicator.get()));
         }));
 
-        this.addButton(new Button(this.width / 4, this.height / 2 - 30, this.width / 2, 20, DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()), p_onPress_1_ -> {
+        this.addButton(new Button(this.width / 4, this.height / 2 - 40, this.width / 2, 20, DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()), p_onPress_1_ -> {
             Config.CLIENT.forceIndicatorRendering.set(!Config.CLIENT.forceIndicatorRendering.get());
             p_onPress_1_.setMessage(DialogTexts.optionStatus(FORCE_INDICATOR_RENDERING, Config.CLIENT.forceIndicatorRendering.get()));
         }));
 
-        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 10, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 1024.0D) {
+        this.addButton(new AbstractSlider(this.width / 4, this.height / 2 - 20, this.width / 2, 20, new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()), (double) Config.CLIENT.renderDistance.get() / 1024.0D) {
             @Override
             protected void updateMessage() {
                 this.setMessage(new TranslationTextComponent("options.damageindicator.displayDistance").append(": ").append("" + Config.CLIENT.renderDistance.get()));
@@ -58,12 +62,24 @@ public class ConfigScreen extends Screen {
             }
         });
 
-        this.addButton(new Button(this.width / 4, this.height / 2 + 10, this.width / 2, 20, DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()), p_onPress_1_ -> {
+        this.addButton(new AbstractSlider(this.width / 4, this.height / 2, this.width / 2, 20, percent("options.damageindicator.fontSize", String.format("%.1f", Config.CLIENT.fontSize.get() * 100.0D)), Config.CLIENT.fontSize.get()) {
+            @Override
+            protected void updateMessage() {
+                this.setMessage(percent("options.damageindicator.fontSize", String.format("%.1f", Config.CLIENT.fontSize.get() * 100.0D)));
+            }
+
+            @Override
+            protected void applyValue() {
+                Config.CLIENT.fontSize.set(MathHelper.clamp(this.value, 0.0D, 1.0D));
+            }
+        });
+
+        this.addButton(new Button(this.width / 4, this.height / 2 + 20, this.width / 2, 20, DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()), p_onPress_1_ -> {
             Config.CLIENT.changeColorWhenCrit.set(!Config.CLIENT.changeColorWhenCrit.get());
             p_onPress_1_.setMessage(DialogTexts.optionStatus(CHANGE_COLOR_WHEN_CRIT, Config.CLIENT.changeColorWhenCrit.get()));
         }));
 
-        this.addButton(new Button(this.width / 4, this.height / 2 + 30, this.width / 2, 20, new TranslationTextComponent(DamageIndicator.MOD_ID + ".config.colorConfig.title"), p_onPress_1_ -> this.minecraft.setScreen(new ColorSettingsScreen(this))));
+        this.addButton(new Button(this.width / 4, this.height / 2 + 40, this.width / 2, 20, new TranslationTextComponent(DamageIndicator.MOD_ID + ".config.colorConfig.title"), p_onPress_1_ -> this.minecraft.setScreen(new ColorSettingsScreen(this))));
 
         this.addButton(new Button(this.width / 4, this.height - 20, this.width / 2, 20, DialogTexts.GUI_DONE, p_onPress_1_ -> this.onClose()));
     }

@@ -21,6 +21,7 @@ public class Config {
     public static class ClientConfig {
         public final ForgeConfigSpec.BooleanValue hideIndicator;
         public final ForgeConfigSpec.BooleanValue forceIndicatorRendering;
+        public final ForgeConfigSpec.DoubleValue fontSize;
         public final ForgeConfigSpec.IntValue renderDistance;
         public final ForgeConfigSpec.BooleanValue changeColorWhenCrit;
         public final ColorConfig colorConfig;
@@ -29,6 +30,7 @@ public class Config {
             builder.push("client");
             this.hideIndicator = builder.define("hide_indicator", false);
             this.forceIndicatorRendering = builder.define("force_indicator_rendering", false);
+            this.fontSize = builder.defineInRange("font_size", 1.0D, 0.0D, 1.0D);
             this.renderDistance = builder.defineInRange("render_distance", 64, 0, 1024);
             this.changeColorWhenCrit = builder.define("change_color_when_crit", false);
             this.colorConfig = new ColorConfig(builder);
