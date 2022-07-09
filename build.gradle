@@ -65,6 +65,10 @@ repositories {
     maven {
         url "https://cursemaven.com"
     }
+    maven {
+        url 'https://repo.maven.apache.org/maven2'
+        name 'Maven Central'
+    }
 }
 
 configurations {
@@ -79,6 +83,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     implementation fg.deobf("curse.maven:criticalib-560696:3581540")
+
+    implementation 'org.mozilla:rhino:1.7.14'
+    implementation 'org.mozilla:rhino-engine:1.7.14'
 
     embed('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
         exclude module: 'guava'

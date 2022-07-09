@@ -2,9 +2,12 @@ package com.hamusuke.damageindicator.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hamusuke.damageindicator.client.renderer.IndicatorRenderer;
+import com.hamusuke.damageindicator.math.AdditionalMathHelper;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.resource.IResourceType;
 import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,14 +23,29 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.Predicate;
 
 @SideOnly(Side.CLIENT)
 public class CustomScriptManager implements ISelectiveResourceReloadListener {
     private static final Logger LOGGER = LogManager.getLogger();
+    @Nullable
+    private final ScriptEngine js;
     private final LinkedHashMap<ResourceLocation, String> scripts = Maps.newLinkedHashMap();
     @Nullable
     private Invocable invocable;
+
+    public CustomScriptManager() {
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+        this.js = scriptEngineManager.getEngineByName("rhino");
+        LOGGER.info("Got Rhino JavaScript Engine or not: {}", this.js == null ? "null" : "got");
+
+        if (this.js != null) {
+            this.js.put("MathHelper", new MathHelper());
+            this.js.put("AdditionalMathHelper", new AdditionalMathHelper());
+            this.js.put("maxAge", IndicatorRenderer.maxAge);
+        }
+    }
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
@@ -39,7 +57,7 @@ public class CustomScriptManager implements ISelectiveResourceReloadListener {
             ResourceLocation resourceLocation = new ResourceLocation(domain, path);
             try {
                 IResource resource = resourceManager.getResource(resourceLocation);
-                this.scripts.put(resourceLocation, StringUtils.join(IOUtils.readLines(resource.getInputStream(), StandardCharsets.UTF_8), '\n'));
+                this.registerScript(resourceLocation, IOUtils.readLines(resource.getInputStream(), StandardCharsets.UTF_8));
             } catch (Exception ignored) {
             }
         }
@@ -47,16 +65,22 @@ public class CustomScriptManager implements ISelectiveResourceReloadListener {
         this.invocable = this.loadScript();
     }
 
+    private void registerScript(ResourceLocation resourceLocation, List<String> script) {
+        String str = StringUtils.join(script, '\n');
+        this.scripts.put(resourceLocation, str);
+        LOGGER.info("Registered animation script:\n{}", str);
+    }
+
     @Nullable
     private Invocable loadScript() {
-        for (String script : this.scripts.values()) {
-            try {
-                ScriptEngineManager manager = new ScriptEngineManager();
-                ScriptEngine js = manager.getEngineByName("JavaScript");
-                js.eval(script);
-                return (Invocable) js;
-            } catch (Exception e) {
-                LOGGER.warn("Error occurred while loading JavaScript. Try to load the next script if it exists", e);
+        if (this.js != null) {
+            for (String script : this.scripts.values()) {
+                try {
+                    this.js.eval(script);
+                    return (Invocable) this.js;
+                } catch (Exception e) {
+                    LOGGER.warn("Error occurred while loading JavaScript. Try to load the next script if it exists", e);
+                }
             }
         }
 
