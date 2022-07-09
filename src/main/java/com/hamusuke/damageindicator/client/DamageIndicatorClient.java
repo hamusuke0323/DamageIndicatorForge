@@ -6,6 +6,7 @@ import com.hamusuke.damageindicator.client.renderer.IndicatorRenderer;
 import com.hamusuke.damageindicator.config.ClientConfig;
 import com.hamusuke.damageindicator.invoker.LivingEntityInvoker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -26,9 +27,11 @@ public class DamageIndicatorClient {
     private static final Minecraft mc = Minecraft.getMinecraft();
     private final Queue<IndicatorRenderer> queue = Queues.newLinkedBlockingDeque();
     private static DamageIndicatorClient instance;
+    private final CustomScriptManager customScriptManager;
 
     public DamageIndicatorClient() {
         instance = this;
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(this.customScriptManager = new CustomScriptManager());
     }
 
     @SubscribeEvent
@@ -74,6 +77,14 @@ public class DamageIndicatorClient {
 
     public void syncIndicatorColor() {
         this.queue.forEach(IndicatorRenderer::syncIndicatorColor);
+    }
+
+    public void clearQueue() {
+        this.queue.clear();
+    }
+
+    public CustomScriptManager getCustomScriptManager() {
+        return this.customScriptManager;
     }
 
     public static DamageIndicatorClient getInstance() {

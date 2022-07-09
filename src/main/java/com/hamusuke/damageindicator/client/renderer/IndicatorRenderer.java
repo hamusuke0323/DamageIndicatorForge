@@ -1,5 +1,6 @@
 package com.hamusuke.damageindicator.client.renderer;
 
+import com.hamusuke.damageindicator.client.CustomScriptManager;
 import com.hamusuke.damageindicator.client.DamageIndicatorClient;
 import com.hamusuke.damageindicator.config.ClientConfig;
 import com.hamusuke.damageindicator.math.AdditionalMathHelper;
@@ -9,11 +10,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+
+import javax.script.Invocable;
 
 @SideOnly(Side.CLIENT)
 public class IndicatorRenderer {
-    protected static final int maxAge = 20;
+    public static final int maxAge = 20;
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final float DEG_TO_RAD = (float) (Math.PI / 180.0F);
     private static final Minecraft mc = Minecraft.getMinecraft();
     protected double prevPosX;
     protected double prevPosY;
@@ -21,18 +28,18 @@ public class IndicatorRenderer {
     protected double x;
     protected double y;
     protected double z;
-    protected float velocity;
+    public final String text;
     protected boolean dead;
-    protected int age;
-    protected final String text;
-    protected final String damageSourceType;
-    protected final boolean crit;
+    public final String damageSourceType;
+    public final boolean crit;
+    public final int textWidth;
+    public final float distance;
     protected int color;
-    protected int textWidth = -1;
+    public final float scaleMultiplier;
     protected long startedTickingTimeMs;
-    protected final float distance;
-    protected final float scaleMultiplier;
-    protected float currentScale = Float.NaN;
+    public float velocity;
+    public int age;
+    public float currentScale;
     protected boolean paused;
     protected long passedTimeMs;
 
@@ -42,6 +49,7 @@ public class IndicatorRenderer {
         this.prevPosY = y;
         this.prevPosZ = z;
         this.text = text;
+        this.textWidth = mc.fontRenderer.getStringWidth(this.text);
         this.damageSourceType = damageSourceType;
         this.crit = crit;
         this.syncIndicatorColor();
@@ -50,11 +58,30 @@ public class IndicatorRenderer {
         this.startedTickingTimeMs = System.currentTimeMillis();
     }
 
+    private static CustomScriptManager getManager() {
+        return DamageIndicatorClient.getInstance().getCustomScriptManager();
+    }
+
     public void tick() {
         this.prevPosX = this.x;
         this.prevPosY = this.y;
         this.prevPosZ = this.z;
 
+        Invocable invocable = getManager().getInvocable();
+        if (invocable != null) {
+            try {
+                invocable.invokeFunction("tick", this);
+                return;
+            } catch (Exception e) {
+                getManager().errorOccurred();
+                LOGGER.warn("Error occurred while invoking method", e);
+            }
+        }
+
+        this.tickDefault();
+    }
+
+    private void tickDefault() {
         if (this.age++ >= maxAge) {
             this.markDead();
         } else if (this.age > maxAge / 2) {
@@ -62,18 +89,14 @@ public class IndicatorRenderer {
             this.velocity *= 0.98F;
             this.moveOnHypotenuse3d(this.velocity);
         } else {
-            if (this.currentScale != this.currentScale) {
-                this.calculateScale(mc.isGamePaused());
-            }
-
             this.moveOnHypotenuse3d(this.currentScale * (10.0F / (float) maxAge));
         }
     }
 
-    private void moveOnHypotenuse3d(float lengthOfHypotenuseToMove) {
+    public void moveOnHypotenuse3d(float lengthOfHypotenuseToMove) {
         float[] yawPitch = this.calculateAngle();
-        float phi = yawPitch[0] * 0.017453292F;
-        float theta = yawPitch[1] * 0.017453292F;
+        float phi = yawPitch[0] * DEG_TO_RAD;
+        float theta = yawPitch[1] * DEG_TO_RAD;
         float hypotenuse2d = lengthOfHypotenuseToMove * MathHelper.sin(theta);
         this.setPos(this.x + hypotenuse2d * MathHelper.sin(phi), this.y + lengthOfHypotenuseToMove * MathHelper.cos(theta), this.z + hypotenuse2d * MathHelper.cos(phi));
     }
@@ -85,11 +108,7 @@ public class IndicatorRenderer {
     public void render(float tickDelta) {
         Entity renderViewEntity = mc.getRenderManager().renderViewEntity;
 
-        if (this.textWidth < 0) {
-            this.textWidth = mc.fontRenderer.getStringWidth(this.text);
-        }
-
-        if (renderViewEntity == null || this.textWidth == 0) {
+        if (renderViewEntity == null || this.textWidth <= 0) {
             this.markDead();
         } else {
             float scale = this.calculateScale(mc.isGamePaused());
@@ -132,9 +151,20 @@ public class IndicatorRenderer {
 
     private float calculateScale(boolean isPaused) {
         long timeDelta = System.currentTimeMillis() - this.startedTickingTimeMs;
-        float scale = AdditionalMathHelper.convexUpwardQuadraticFunction(MathHelper.clamp(timeDelta / (12.5F * (float) maxAge), 0.0F, 1.0F), this.crit ? -0.2F : -0.5F, this.crit ? 2.0F : 0.5F, 0.00375F * this.distance * 1.732050807F * this.scaleMultiplier, 0.0075F * this.distance * 1.732050807F * this.scaleMultiplier * this.scaleMultiplier * (this.crit ? 1.0F : 0.8F));
-        scale -= 0.00025 * this.textWidth;
-        scale = MathHelper.clamp(scale, 0.0001F, Float.MAX_VALUE);
+        float scale;
+
+        Invocable invocable = getManager().getInvocable();
+        if (invocable != null) {
+            try {
+                scale = (float) (double) invocable.invokeFunction("calculateScale", timeDelta, this);
+            } catch (Exception e) {
+                getManager().errorOccurred();
+                LOGGER.warn("Error occurred while invoking method", e);
+                scale = this.calculateScaleDefault(timeDelta);
+            }
+        } else {
+            scale = this.calculateScaleDefault(timeDelta);
+        }
 
         if (isPaused && !this.paused) {
             this.passedTimeMs = timeDelta;
@@ -148,6 +178,13 @@ public class IndicatorRenderer {
         }
 
         return this.currentScale = scale;
+    }
+
+    private float calculateScaleDefault(long timeDelta) {
+        float scale = AdditionalMathHelper.convexUpwardQuadraticFunction(MathHelper.clamp(timeDelta / (12.5F * (float) maxAge), 0.0F, 1.0F), this.crit ? -0.2F : -0.5F, this.crit ? 2.0F : 0.5F, 0.00375F * this.distance * 1.732050807F * this.scaleMultiplier, 0.0075F * this.distance * 1.732050807F * this.scaleMultiplier * this.scaleMultiplier * (this.crit ? 1.0F : 0.8F));
+        scale -= 0.00025F * this.textWidth;
+        scale = MathHelper.clamp(scale, 0.0001F, 20.0F);
+        return scale;
     }
 
     public void syncIndicatorColor() {
