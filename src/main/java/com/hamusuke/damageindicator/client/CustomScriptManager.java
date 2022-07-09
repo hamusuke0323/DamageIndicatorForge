@@ -3,11 +3,9 @@ package com.hamusuke.damageindicator.client;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hamusuke.damageindicator.client.renderer.IndicatorRenderer;
-import com.hamusuke.damageindicator.math.AdditionalMathHelper;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.resource.IResourceType;
 import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.fml.relauncher.Side;
@@ -41,8 +39,6 @@ public class CustomScriptManager implements ISelectiveResourceReloadListener {
         LOGGER.info("Got Rhino JavaScript Engine or not: {}", this.js == null ? "null" : "got");
 
         if (this.js != null) {
-            this.js.put("MathHelper", new MathHelper());
-            this.js.put("AdditionalMathHelper", new AdditionalMathHelper());
             this.js.put("maxAge", IndicatorRenderer.maxAge);
         }
     }

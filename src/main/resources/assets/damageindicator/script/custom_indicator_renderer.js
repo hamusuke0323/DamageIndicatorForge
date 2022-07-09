@@ -11,8 +11,8 @@ function tick(renderer) {
 }
 
 function calculateScale(timeDelta, renderer) {
-    var scale = AdditionalMathHelper.convexUpwardQuadraticFunction(MathHelper.clamp(timeDelta / (12.5 * maxAge), 0.0, 1.0), renderer.crit ? -0.2 : -0.5, renderer.crit ? 2.0 : 0.5, 0.00375 * renderer.distance * 1.732050807 * renderer.scaleMultiplier, 0.0075 * renderer.distance * 1.732050807 * renderer.scaleMultiplier * renderer.scaleMultiplier * (renderer.crit ? 1.0 : 0.8));
+    var scale = Packages.com.hamusuke.damageindicator.math.AdditionalMathHelper.convexUpwardQuadraticFunction(Packages.net.minecraft.util.math.MathHelper.clamp(timeDelta / (12.5 * maxAge), 0.0, 1.0), renderer.crit ? -0.2 : -0.5, renderer.crit ? 2.0 : 0.5, 0.00375 * renderer.distance * 1.732050807 * renderer.scaleMultiplier, 0.0075 * renderer.distance * 1.732050807 * renderer.scaleMultiplier * renderer.scaleMultiplier * (renderer.crit ? 1.0 : 0.8));
     scale -= 0.00025 * renderer.textWidth;
-    scale = MathHelper.clamp(scale, 0.0001, 20.0);
+    scale = Packages.net.minecraft.util.math.MathHelper.clamp(scale, 0.0001, 20.0);
     return scale;
 }
